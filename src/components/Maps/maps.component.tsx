@@ -16,14 +16,10 @@ import { observer } from "mobx-react-lite"
 
 interface MapBody extends MapViewProps {
   mapStyle?: StyleProp<ViewStyle>
-  teste?: any
 }
 
-const MapComponent: React.FC<MapBody> = ({ mapStyle, teste }) => {
+const MapComponent: React.FC<MapBody> = ({ mapStyle }) => {
   const [location, setLocation] = useState<LocationObject | null>()
-
-  let latitude = "-30.027316193960445"
-  let altitude = "-51.182624941893074"
 
   const mapRef = useRef<MapView>(null)
 
@@ -102,7 +98,7 @@ const MapComponent: React.FC<MapBody> = ({ mapStyle, teste }) => {
           ref={mapRef}
           style={[mapStyle]}
           initialRegion={{
-            latitude: +latitude,
+            latitude: location.coords.latitude,
             longitude: location.coords.longitude,
             latitudeDelta: 0.005,
             longitudeDelta: 0.005,
@@ -110,7 +106,7 @@ const MapComponent: React.FC<MapBody> = ({ mapStyle, teste }) => {
         >
           <Marker
             coordinate={{
-              latitude: +latitude,
+              latitude: location.coords.latitude,
               longitude: location.coords.longitude,
             }}
             title="Usuário"
