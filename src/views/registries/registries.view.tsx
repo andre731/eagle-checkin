@@ -109,6 +109,7 @@ const RegistriesView = (): JSX.Element => {
         <TouchableOpacity onPress={toggleModal} style={Styles.calendarButton}>
           <Text style={[Styles.calendarButtonText, { width: 90 }]}>Filtrar por Data</Text>
         </TouchableOpacity>
+        <View style={{ marginTop: 50 }}></View>
         {selectedDate && (
           <TouchableOpacity onPress={clearFilters} style={Styles.calendarButton}>
             <Text style={[Styles.calendarButtonText, { width: 90 }]}>Limpar Filtro</Text>
@@ -125,7 +126,7 @@ const RegistriesView = (): JSX.Element => {
           )
         ) : (
           Object.entries(groupedRegistries).map(([date, registries], index) => (
-            <View key={index} style={{ marginTop: 80 }}>
+            <View key={index}>
               <Text style={Styles.dateHeader}>{formatDate(date)}</Text>
               {renderRegistries(registries)}
             </View>
