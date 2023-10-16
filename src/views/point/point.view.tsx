@@ -9,6 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native"
+import Toast from "react-native-toast-message"
 
 import { store } from "@/store"
 
@@ -43,9 +44,10 @@ const renderLocation = (currentTime: Date): JSX.Element => {
         {` ${locationData.hours}:${locationData.minutes}:${locationData.seconds}`}
       </Text>
       <Text style={Style.location}>
-        {" "}
-        {store.mapStore.currentLocation.street} - {store.mapStore.currentLocation.streetNumber},{" "}
-        {store.mapStore.currentLocation.city}
+        {store.mapStore.currentLocation
+          ? `
+        ${store.mapStore.currentLocation.street} - ${store.mapStore.currentLocation.streetNumber}, ${store.mapStore.currentLocation.city}`
+          : "Localização não informada"}
       </Text>
     </View>
   )
@@ -93,6 +95,14 @@ const PointView: React.FC<PointViewProps> = () => {
   }
 
   useEffect(() => {
+    Toast.show({
+      type: "info",
+      text1: "Atenção!",
+      text2: "Aguarde o carregamento da sua localização para o uso correto!",
+      position: "top",
+      topOffset: 120,
+    })
+
     const intervalId = setInterval(() => {
       setCurrentTime(new Date())
     }, 1000)
@@ -118,10 +128,20 @@ const PointView: React.FC<PointViewProps> = () => {
     store.registriesStore.insertRegistries({
       id: idCounter,
       date: formatDateToYYYYMMDD(new Date()),
-      local: `${store.mapStore.currentLocation.street} - ${store.mapStore.currentLocation.streetNumber},
-        ${store.mapStore.currentLocation.city}`,
+      local: store.mapStore.currentLocation.street
+        ? `${store.mapStore.currentLocation.street} - ${store.mapStore.currentLocation.streetNumber},
+        ${store.mapStore.currentLocation.city}`
+        : "Localização não informada",
       hours: formatTime(currentTime.getHours()) + ":" + formatTime(currentTime.getMinutes()),
       justify: justify,
+    })
+
+    Toast.show({
+      type: "success",
+      text1: "Tudo certo!",
+      text2: "Batida de ponto realizada com sucesso!",
+      position: "top",
+      topOffset: 120,
     })
 
     setTimeout(() => {
@@ -138,72 +158,86 @@ const PointView: React.FC<PointViewProps> = () => {
     </TouchableOpacity>
   )
 
-  const renderButton = (): JSX.Element => (
-    <View style={Style.containerButton}>
-      <ButtonComponent title="Registrar Batida" onPress={() => setModalVisible(!isModalVisible)} />
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={isModalVisible}
-        onRequestClose={() => {
-          setModalVisible(false)
-        }}
-      >
-        <View style={Style.containerModal}>
-          <View style={Style.modalView}>
-            <Text style={Style.modalText2}> Como você está se sentindo hoje?</Text>
-            <Text style={Style.modalText}>
-              {renderEmoji("🤩")}
-              {renderEmoji("🙂")}
-              {renderEmoji("😐")}
-              {renderEmoji("😞")}
-              {renderEmoji("😵")}
-            </Text>
-            <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-              <TextInput
-                value={justify}
-                onChangeText={handleInputChange}
-                multiline
-                numberOfLines={20}
-                placeholder="Justifique aqui a sua batida."
-                style={{
-                  width: 300,
-                  height: 100,
-                  padding: 10,
-                  borderColor: "#CACACA",
-                  borderRadius: 8,
-                  borderWidth: 1,
-                }}
+  const renderButton = (): JSX.Element => {
+    const [enabled, setEnabled] = useState(true)
+
+    setTimeout(() => {
+      setEnabled(false)
+    }, 9000)
+
+    return (
+      <View style={Style.containerButton}>
+        <ButtonComponent
+          disabled={enabled}
+          title="Registrar Batida"
+          onPress={() => setModalVisible(!isModalVisible)}
+        />
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={isModalVisible}
+          onRequestClose={() => {
+            setModalVisible(false)
+          }}
+        >
+          <View style={Style.containerModal}>
+            <View style={Style.modalView}>
+              <Text style={Style.modalText2}> Como você está se sentindo hoje?</Text>
+              <Text style={Style.modalText}>
+                {renderEmoji("🤩")}
+                {renderEmoji("🙂")}
+                {renderEmoji("😐")}
+                {renderEmoji("😞")}
+                {renderEmoji("😵")}
+              </Text>
+              <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+                <TextInput
+                  value={justify}
+                  onChangeText={handleInputChange}
+                  multiline
+                  numberOfLines={20}
+                  placeholder="Justifique aqui a sua batida."
+                  style={{
+                    width: 300,
+                    height: 100,
+                    padding: 10,
+                    borderColor: "#CACACA",
+                    borderRadius: 8,
+                    borderWidth: 1,
+                  }}
+                />
+              </TouchableWithoutFeedback>
+              <ButtonComponent
+                buttonStyle={{ width: 180, marginTop: 20 }}
+                title="Concluir"
+                onPress={() => addRegistry({ justify: justify })}
               />
-            </TouchableWithoutFeedback>
-            <ButtonComponent
-              buttonStyle={{ width: 180, marginTop: 20 }}
-              title="Concluir"
-              onPress={() => addRegistry({ justify: justify })}
-            />
-            <TouchableOpacity
-              onPress={() => setModalVisible(!isModalVisible)}
-              style={{
-                marginTop: 25,
-              }}
-            >
-              <Text>Cancelar batida</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setModalVisible(!isModalVisible)}
+                style={{
+                  marginTop: 25,
+                }}
+              >
+                <Text>Cancelar batida</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </Modal>
-    </View>
-  )
+        </Modal>
+      </View>
+    )
+  }
 
   return (
-    <View style={Style.container}>
-      <View style={Style.containerMap}>
-        <MapComponent mapStyle={Style.map} />
+    <>
+      <View style={Style.container}>
+        <View style={Style.containerMap}>
+          <MapComponent mapStyle={Style.map} />
+        </View>
+        {renderLocation(currentTime)}
+        {renderRegistries()}
+        {renderButton()}
       </View>
-      {renderLocation(currentTime)}
-      {renderRegistries()}
-      {renderButton()}
-    </View>
+    </>
   )
 }
 

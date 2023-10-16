@@ -1,5 +1,8 @@
 import React, { useState } from "react"
 import { Modal, Text, TextInput, TouchableOpacity, View, Keyboard } from "react-native"
+
+import Toast from "react-native-toast-message"
+
 import { Colors } from "@/common/enums/colors.enum"
 import { Styles } from "./modal-registry.style"
 import { registriesStore } from "@/store/registries.map"
@@ -46,6 +49,15 @@ const EditRegistryModal: React.FC<{
     }
 
     registriesStore.insertRegistries(editedRegistry)
+
+    Toast.show({
+      type: "success",
+      text1: "Tudo certo!",
+      text2: "Batida de ponto ajustada com sucesso!",
+      position: "bottom",
+      topOffset: 120,
+    })
+
     onClose()
   }
 
