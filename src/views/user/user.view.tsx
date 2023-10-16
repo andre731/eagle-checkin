@@ -1,11 +1,12 @@
-import React from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { observer } from "mobx-react-lite"
-import { View, Text } from "react-native"
+import { View, Text, Platform, Button } from "react-native"
 import { NavigationProp } from "@react-navigation/native"
 
 import { ButtonComponent } from "@/components/Button/button.component"
 import { Style } from "./user.style"
 import ToggleComponent from "@/components/Toggle/toggle.component"
+import { store } from "@/store"
 
 interface UserViewProps {
   navigation: NavigationProp<any>
@@ -39,30 +40,12 @@ const renderUserInformations = () => {
   )
 }
 
-const renderConfigs = () => {
-  return (
-    <View
-      style={{
-        width: "80%",
-        marginTop: 90,
-        marginBottom: 90,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-      }}
-    >
-      <Text>Permitir que o aplicativo envie notificações</Text>
-      <ToggleComponent />
-    </View>
-  )
-}
-
 const UserView: React.FC<UserViewProps> = ({ navigation }) => {
   return (
     <View style={Style.container}>
       {renderLogoUser({ name: "Andre", lastName: "Santos" })}
       {renderUserInformations()}
-      {renderConfigs()}
+
       <View
         style={{
           width: "80%",

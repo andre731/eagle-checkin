@@ -1,7 +1,8 @@
 import { observable, action, makeObservable } from "mobx"
 
 class RegistriesStore {
-  @observable registries: {
+  @observable
+  registries: {
     id: number
     date: string
     hours: string
@@ -13,7 +14,8 @@ class RegistriesStore {
     makeObservable(this)
   }
 
-  @action insertRegistries(registry: {
+  @action
+  insertRegistries(registry: {
     id: number
     date: string
     hours: string

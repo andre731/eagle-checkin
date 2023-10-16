@@ -1,12 +1,14 @@
 import { Colors } from "@/common/enums/colors.enum"
 import { observer } from "mobx-react-lite"
 import { useState } from "react"
-import { Switch } from "react-native"
+import { Switch, SwitchProps } from "react-native"
 
-const ToggleComponent = ({ ...opts }) => {
-  const [isEnabled, setIsEnabled] = useState(false)
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState)
+interface ToggleProps extends SwitchProps {
+  isEnabled: boolean
+  toggleSwitch: any
+}
 
+const ToggleComponent: React.FC<ToggleProps> = ({ isEnabled, toggleSwitch, ...opts }) => {
   return (
     <Switch
       trackColor={{ false: "#767577", true: Colors.SECONDARY }}

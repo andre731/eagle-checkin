@@ -6,12 +6,13 @@ import { Colors } from "@/common/enums/colors.enum"
 
 export const WelcomeScreen = () => {
   const navigation = useNavigation()
+
   useEffect(() => {
     const timer = setTimeout(() => {
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{ name: "PointView" }],
+          routes: [{ name: "Eagle CheckIn" }],
         }),
       )
     }, 2500)

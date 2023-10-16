@@ -66,7 +66,7 @@ const MapComponent: React.FC<MapBody> = ({ mapStyle }) => {
   setTimeout(() => {
     getStreetName()
     vefifyLocation()
-  }, 800)
+  }, 1000)
 
   useEffect(() => {
     requestLocationPermission()

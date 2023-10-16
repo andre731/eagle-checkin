@@ -13,7 +13,6 @@ export const Style = StyleSheet.create({
     alignContent: "center",
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: 50,
     paddingBottom: 20,
   },
 

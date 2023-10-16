@@ -1,6 +1,6 @@
-import React from "react"
+import React, { useLayoutEffect } from "react"
 import { Image, TextInput, View } from "react-native"
-import { NavigationProp } from "@react-navigation/native"
+import { NavigationProp, useFocusEffect } from "@react-navigation/native"
 import { Style } from "./login.style"
 import { Wrapper } from "@/styles/wrapper.style"
 import { ButtonComponent } from "@components/Button/button.component"
@@ -34,6 +34,12 @@ const renderLoginButton = (navigation: NavigationProp<any>): JSX.Element => {
 }
 
 const LoginView: React.FC<LoginViewProps> = ({ navigation }) => {
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: null, // Remove the back button from the header
+    })
+  }, [navigation])
+
   return (
     <View style={Style.container}>
       {renderLogo()}

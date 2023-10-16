@@ -1,7 +1,8 @@
 import { observable, action, makeObservable } from "mobx"
 
 class MapsStore {
-  @observable currentLocation = {
+  @observable
+  currentLocation = {
     city: "",
     district: "",
     streetNumber: "",
@@ -10,7 +11,8 @@ class MapsStore {
     region: "",
   }
 
-  @observable abstractLocation = {
+  @observable
+  abstractLocation = {
     altitude: "",
     latitude: "",
   }
@@ -19,7 +21,8 @@ class MapsStore {
     makeObservable(this)
   }
 
-  @action updateLocation(currentLocationBody: {
+  @action
+  updateLocation(currentLocationBody: {
     city: string
     district: string
     streetNumber: string

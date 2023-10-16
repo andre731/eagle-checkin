@@ -51,6 +51,14 @@ const renderLocation = (currentTime: Date): JSX.Element => {
   )
 }
 
+const formatDate = (date: string) => {
+  const parts = date.split("-")
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`
+  }
+  return date
+}
+
 const renderRegistries = (): JSX.Element => {
   return (
     <View style={Style.containerRegistries}>
@@ -62,7 +70,7 @@ const renderRegistries = (): JSX.Element => {
           {store.registriesStore.registries.slice(-5).map((r, i) => {
             return (
               <View style={Style.registries} key={i}>
-                <Text>{r.date}</Text>
+                <Text>{formatDate(r.date)}</Text>
                 <Text style={{ textAlign: "center" }}>{r.local}</Text>
                 <Text>{r.hours}</Text>
               </View>
@@ -94,6 +102,14 @@ const PointView: React.FC<PointViewProps> = () => {
     }
   }, [])
 
+  function formatDateToYYYYMMDD(date: Date) {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    const day = String(date.getDate()).padStart(2, "0")
+
+    return `${year}-${month}-${day}`
+  }
+
   const addRegistry = ({ justify }: { justify: string }) => {
     const lastRegistry = [...store.registriesStore.registries].pop()
 
@@ -101,7 +117,7 @@ const PointView: React.FC<PointViewProps> = () => {
 
     store.registriesStore.insertRegistries({
       id: idCounter,
-      date: currentTime.toLocaleDateString(),
+      date: formatDateToYYYYMMDD(new Date()),
       local: `${store.mapStore.currentLocation.street} - ${store.mapStore.currentLocation.streetNumber},
         ${store.mapStore.currentLocation.city}`,
       hours: formatTime(currentTime.getHours()) + ":" + formatTime(currentTime.getMinutes()),
