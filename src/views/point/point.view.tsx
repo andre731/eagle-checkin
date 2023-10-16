@@ -1,10 +1,194 @@
-import React from "react"
-import { View, Text } from "react-native"
+import React, { useEffect, useState } from "react"
+import {
+  View,
+  Text,
+  ScrollView,
+  Modal,
+  TouchableWithoutFeedback,
+  Keyboard,
+  TextInput,
+  TouchableOpacity,
+} from "react-native"
 
-export function PointView() {
+import { store } from "@/store"
+
+import { Style } from "./point.style"
+import MapComponent from "@/components/Maps/maps.component"
+import { ButtonComponent } from "@/components/Button/button.component"
+import { observer } from "mobx-react-lite"
+
+interface PointViewProps {}
+
+interface LocationData {
+  DateNow: string
+  hours: string
+  minutes: string
+  seconds: string
+}
+
+const formatTime = (time: number): string => (time < 10 ? `0${time}` : `${time}`)
+
+const renderLocation = (currentTime: Date): JSX.Element => {
+  const locationData: LocationData = {
+    DateNow: new Date().toLocaleDateString(),
+    hours: formatTime(currentTime.getHours()),
+    minutes: formatTime(currentTime.getMinutes()),
+    seconds: formatTime(currentTime.getSeconds()),
+  }
+
   return (
-    <View style={{ backgroundColor: "red" }}>
-      <Text>Point</Text>
+    <View style={Style.containerLocation}>
+      <Text style={Style.locationDate}>
+        {`${locationData.DateNow}`} -
+        {` ${locationData.hours}:${locationData.minutes}:${locationData.seconds}`}
+      </Text>
+      <Text style={Style.location}>
+        {" "}
+        {store.mapStore.currentLocation.street} - {store.mapStore.currentLocation.streetNumber},{" "}
+        {store.mapStore.currentLocation.city}
+      </Text>
     </View>
   )
 }
+
+const renderRegistries = (): JSX.Element => {
+  return (
+    <View style={Style.containerRegistries}>
+      <View style={Style.headerRegistries}>
+        <Text style={Style.headerRegistriesText}>Últimos Registros</Text>
+      </View>
+      <ScrollView style={Style.listRegistries}>
+        <View style={{ height: "80%" }}>
+          {store.registriesStore.registries.slice(-5).map((r, i) => {
+            return (
+              <View style={Style.registries} key={i}>
+                <Text>{r.date}</Text>
+                <Text style={{ textAlign: "center" }}>{r.local}</Text>
+                <Text>{r.hours}</Text>
+              </View>
+            )
+          })}
+        </View>
+      </ScrollView>
+    </View>
+  )
+}
+
+const PointView: React.FC<PointViewProps> = () => {
+  const [currentTime, setCurrentTime] = useState<Date>(new Date())
+  const [isModalVisible, setModalVisible] = useState<boolean>(false)
+  const [selectedEmoji, setSelectedEmoji] = useState<string>("")
+  const [justify, setJustify] = useState<string>("")
+
+  const handleInputChange = (e: string) => {
+    setJustify(e)
+  }
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 1000)
+
+    return () => {
+      clearInterval(intervalId)
+    }
+  }, [])
+
+  const addRegistry = ({ justify }: { justify: string }) => {
+    const lastRegistry = [...store.registriesStore.registries].pop()
+
+    const idCounter = lastRegistry ? lastRegistry.id + 1 : 1
+
+    store.registriesStore.insertRegistries({
+      id: idCounter,
+      date: currentTime.toLocaleDateString(),
+      local: `${store.mapStore.currentLocation.street} - ${store.mapStore.currentLocation.streetNumber},
+        ${store.mapStore.currentLocation.city}`,
+      hours: formatTime(currentTime.getHours()) + ":" + formatTime(currentTime.getMinutes()),
+      justify: justify,
+    })
+
+    setTimeout(() => {
+      setModalVisible(!isModalVisible)
+    }, 500)
+  }
+
+  const renderEmoji = (emoji: string) => (
+    <TouchableOpacity
+      onPress={() => setSelectedEmoji(emoji)}
+      style={[selectedEmoji === emoji && Style.selectedEmoji]}
+    >
+      <Text style={Style.emoji}>{emoji}</Text>
+    </TouchableOpacity>
+  )
+
+  const renderButton = (): JSX.Element => (
+    <View style={Style.containerButton}>
+      <ButtonComponent title="Registrar Batida" onPress={() => setModalVisible(!isModalVisible)} />
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={isModalVisible}
+        onRequestClose={() => {
+          setModalVisible(false)
+        }}
+      >
+        <View style={Style.containerModal}>
+          <View style={Style.modalView}>
+            <Text style={Style.modalText2}> Como você está se sentindo hoje?</Text>
+            <Text style={Style.modalText}>
+              {renderEmoji("🤩")}
+              {renderEmoji("🙂")}
+              {renderEmoji("😐")}
+              {renderEmoji("😞")}
+              {renderEmoji("😵")}
+            </Text>
+            <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+              <TextInput
+                value={justify}
+                onChangeText={handleInputChange}
+                multiline
+                numberOfLines={20}
+                placeholder="Justifique aqui a sua batida."
+                style={{
+                  width: 300,
+                  height: 100,
+                  padding: 10,
+                  borderColor: "#CACACA",
+                  borderRadius: 8,
+                  borderWidth: 1,
+                }}
+              />
+            </TouchableWithoutFeedback>
+            <ButtonComponent
+              buttonStyle={{ width: 180, marginTop: 20 }}
+              title="Concluir"
+              onPress={() => addRegistry({ justify: justify })}
+            />
+            <TouchableOpacity
+              onPress={() => setModalVisible(!isModalVisible)}
+              style={{
+                marginTop: 25,
+              }}
+            >
+              <Text>Cancelar batida</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  )
+
+  return (
+    <View style={Style.container}>
+      <View style={Style.containerMap}>
+        <MapComponent mapStyle={Style.map} />
+      </View>
+      {renderLocation(currentTime)}
+      {renderRegistries()}
+      {renderButton()}
+    </View>
+  )
+}
+
+export default observer(PointView)

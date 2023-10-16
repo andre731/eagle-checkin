@@ -14,7 +14,7 @@ export const WelcomeScreen = () => {
           routes: [{ name: "PointView" }],
         }),
       )
-    }, 2000)
+    }, 2500)
 
     return () => clearTimeout(timer)
   }, [navigation])
