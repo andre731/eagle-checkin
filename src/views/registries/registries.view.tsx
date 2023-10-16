@@ -13,6 +13,7 @@ interface Registry {
   date: string
   local: string
   hours: string
+  justify: string
 }
 
 interface GroupedRegistries {
@@ -139,7 +140,7 @@ const RegistriesView = (): JSX.Element => {
         <EditRegistryModal
           visible={editModalVisible}
           onClose={handleCloseEditModal}
-          registry={selectedRegistry}
+          registry={selectedRegistry as Registry}
         />
       </Modal>
 

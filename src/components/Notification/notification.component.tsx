@@ -12,8 +12,8 @@ const renderNotification = async () => {
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowAlert: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
     }),
   })
 
@@ -41,6 +41,9 @@ export async function schedulePushNotification(seconds: number) {
       title: "Olá Colaborador(a) Futuro! 📬",
       body: "Você deixou um alarme ativo para a batida do seu ponto.",
       data: { data: "clique aqui para bater o ponto" },
+      priority: "max",
+      sticky: true,
+      sound: true,
     },
     trigger: { seconds: 2 },
   }).then((res) => {

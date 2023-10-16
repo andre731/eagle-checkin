@@ -3,11 +3,10 @@ import { View, StyleProp, ViewStyle } from "react-native"
 import MapView, { MapViewProps, Marker } from "react-native-maps"
 import {
   requestForegroundPermissionsAsync,
-  getCurrentPositionAsync,
   LocationObject,
-  watchPositionAsync,
-  LocationAccuracy,
   reverseGeocodeAsync,
+  getLastKnownPositionAsync,
+  getCurrentPositionAsync,
 } from "expo-location"
 
 import { Styles } from "./maps.style"
@@ -20,7 +19,7 @@ interface MapBody extends MapViewProps {
 }
 
 const MapComponent: React.FC<MapBody> = ({ mapStyle }) => {
-  const [location, setLocation] = useState<LocationObject | null>()
+  const [location, setLocation] = useState<LocationObject | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   const mapRef = useRef<MapView>(null)
@@ -29,14 +28,19 @@ const MapComponent: React.FC<MapBody> = ({ mapStyle }) => {
     const { granted } = await requestForegroundPermissionsAsync()
 
     if (granted) {
-      const currentPosition = await getCurrentPositionAsync()
+      const lastKnownLocation = await getLastKnownPositionAsync({})
 
-      setLocation(currentPosition)
-      getStreetName()
+      setLocation(lastKnownLocation)
+      getStreetName(lastKnownLocation as LocationObject)
+
+      if (!lastKnownLocation) {
+        const currentLocation = await getCurrentPositionAsync()
+        setLocation(currentLocation)
+      }
     }
   }
 
-  const vefifyLocation = () => {
+  const verifyLocation = () => {
     if (mapStore.abstractLocation.altitude != null && mapStore.abstractLocation.latitude != null) {
       if (location?.coords) {
         location.coords.latitude = +mapStore.abstractLocation.latitude
@@ -45,10 +49,10 @@ const MapComponent: React.FC<MapBody> = ({ mapStyle }) => {
     }
   }
 
-  async function getStreetName() {
+  async function getStreetName(location: LocationObject) {
     const params = {
-      latitude: location?.coords.latitude ?? 0,
-      longitude: location?.coords.longitude ?? 0,
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
     }
 
     await reverseGeocodeAsync(params).then((res) => {
@@ -68,39 +72,15 @@ const MapComponent: React.FC<MapBody> = ({ mapStyle }) => {
   useEffect(() => {
     const loadingTimeout = setTimeout(() => {
       setIsLoading(false)
-    }, 9000)
+    }, 1000)
 
     return () => {
       clearTimeout(loadingTimeout)
     }
   }, [])
 
-  setTimeout(() => {
-    getStreetName()
-    vefifyLocation()
-  }, 1000)
-
   useEffect(() => {
     requestLocationPermission()
-  }, [])
-
-  useEffect(() => {
-    watchPositionAsync(
-      {
-        accuracy: LocationAccuracy.Highest,
-        timeInterval: 1000,
-        distanceInterval: 1,
-      },
-      () => (location: LocationObject) => {
-        setLocation(location)
-        vefifyLocation()
-        getStreetName()
-        mapRef.current?.animateCamera({
-          pitch: 70,
-          center: location.coords,
-        })
-      },
-    )
   }, [])
 
   return (

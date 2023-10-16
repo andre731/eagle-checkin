@@ -28,6 +28,17 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "expo": {
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/logo_login.png",
+          "color": "#000"
+        }
+      ]
+    ]
+  }
   }
 }

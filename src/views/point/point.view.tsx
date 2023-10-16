@@ -163,7 +163,7 @@ const PointView: React.FC<PointViewProps> = () => {
 
     setTimeout(() => {
       setEnabled(false)
-    }, 9000)
+    }, 500)
 
     return (
       <View style={Style.containerButton}>

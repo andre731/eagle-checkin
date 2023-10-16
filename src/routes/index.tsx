@@ -22,8 +22,8 @@ const drawer = createDrawerNavigator()
 
 const DrawerScreens = () => (
   <drawer.Navigator>
-    <drawer.Screen name="Registro de batidas" component={RegistriesView} />
     <drawer.Screen name="Bater Ponto" component={PointView} />
+    <drawer.Screen name="Registro de batidas" component={RegistriesView} />
     <drawer.Screen name="Alarmes" component={ScheduleView} />
     <drawer.Screen name="Perfil do Usuário" component={UserView} />
   </drawer.Navigator>
