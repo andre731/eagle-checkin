@@ -13,6 +13,7 @@ import {
 import { Styles } from "./maps.style"
 import { mapStore } from "@/store/map.store"
 import { observer } from "mobx-react-lite"
+import LoadingOverlay from "../Load/load.component"
 
 interface MapBody extends MapViewProps {
   mapStyle?: StyleProp<ViewStyle>
@@ -20,6 +21,7 @@ interface MapBody extends MapViewProps {
 
 const MapComponent: React.FC<MapBody> = ({ mapStyle }) => {
   const [location, setLocation] = useState<LocationObject | null>()
+  const [isLoading, setIsLoading] = useState(true)
 
   const mapRef = useRef<MapView>(null)
 
@@ -62,6 +64,16 @@ const MapComponent: React.FC<MapBody> = ({ mapStyle }) => {
       mapStore.updateLocation(updatedInfos)
     })
   }
+
+  useEffect(() => {
+    const loadingTimeout = setTimeout(() => {
+      setIsLoading(false)
+    }, 9000)
+
+    return () => {
+      clearTimeout(loadingTimeout)
+    }
+  }, [])
 
   setTimeout(() => {
     getStreetName()
@@ -114,6 +126,7 @@ const MapComponent: React.FC<MapBody> = ({ mapStyle }) => {
           />
         </MapView>
       )}
+      {isLoading && <LoadingOverlay />}
     </View>
   )
 }

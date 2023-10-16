@@ -38,11 +38,13 @@ const renderNotification = async () => {
 export async function schedulePushNotification(seconds: number) {
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: "You've got mail! 📬",
-      body: "Here is the notification body",
-      data: { data: "goes here" },
+      title: "Olá Colaborador(a) Futuro! 📬",
+      body: "Você deixou um alarme ativo para a batida do seu ponto.",
+      data: { data: "clique aqui para bater o ponto" },
     },
     trigger: { seconds: 2 },
+  }).then((res) => {
+    console.log(res)
   })
 }
 
@@ -82,5 +84,3 @@ async function registerForPushNotificationsAsync() {
 
   return token
 }
-
-renderNotification()

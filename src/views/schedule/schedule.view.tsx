@@ -19,8 +19,8 @@ const renderPicker = ({ value, onValueChange }: PickerProps) => {
       style={styles.picker}
       itemStyle={styles.pickerItem}
     >
-      {[...Array(24).keys()].map((hour) => (
-        <Picker.Item key={hour} label={`${hour} h`} value={hour} />
+      {[...Array(23).keys()].map((hour) => (
+        <Picker.Item key={hour + 1} label={`${hour + 1} h`} value={hour + 1} />
       ))}
     </Picker>
   )

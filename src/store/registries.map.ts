@@ -22,7 +22,13 @@ class RegistriesStore {
     local: string
     justify: string
   }) {
-    this.registries.push(registry)
+    const existingRegistryIndex = this.registries.findIndex((r) => r.id === registry.id)
+
+    if (existingRegistryIndex !== -1) {
+      this.registries[existingRegistryIndex] = registry
+    } else {
+      this.registries.push(registry)
+    }
   }
 }
 

@@ -6,8 +6,10 @@ import { View, Text, ScrollView, TouchableOpacity, Modal } from "react-native"
 
 import { Styles } from "./registries.style"
 import { Colors } from "@/common/enums/colors.enum"
+import EditRegistryModal from "@/components/Modal-Registry/modal-registry.component"
 
 interface Registry {
+  id: number
   date: string
   local: string
   hours: string
@@ -45,6 +47,24 @@ const RegistriesView = (): JSX.Element => {
   const [isModalVisible, setModalVisible] = useState(false)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
 
+  const [editModalVisible, setEditModalVisible] = useState(false)
+  const [selectedRegistry, setSelectedRegistry] = useState<Registry | null>(null)
+
+  const handleEditRegistry = (registryId: number) => {
+    const selectedRegistry = store.registriesStore.registries.find(
+      (registry) => registry.id === registryId,
+    )
+    if (selectedRegistry) {
+      setSelectedRegistry(selectedRegistry)
+      setEditModalVisible(true)
+    }
+  }
+
+  const handleCloseEditModal = () => {
+    setEditModalVisible(false)
+    setSelectedRegistry(null)
+  }
+
   const toggleModal = () => {
     setModalVisible(!isModalVisible)
   }
@@ -63,32 +83,37 @@ const RegistriesView = (): JSX.Element => {
     return (
       <View>
         {registries.map((registry, i) => (
-          <View style={Styles.registries} key={i}>
-            <Text style={Styles.text}>{formatDate(registry.date)}</Text>
-            <Text style={{ textAlign: "center", ...Styles.text }}>{registry.local}</Text>
-            <Text style={Styles.text}>{registry.hours}</Text>
-          </View>
+          <TouchableOpacity key={i} onPress={() => handleEditRegistry(registry.id)}>
+            <View style={Styles.registries}>
+              <Text style={Styles.text}>{formatDate(registry.date)}</Text>
+              <Text style={{ textAlign: "center", ...Styles.text }}>{registry.local}</Text>
+              <Text style={Styles.text}>{registry.hours}</Text>
+            </View>
+          </TouchableOpacity>
         ))}
       </View>
     )
   }
 
+  const renderNoRecordsMessage = () => (
+    <View style={{ justifyContent: "center", alignItems: "center", marginTop: 50 }}>
+      <Text style={{ textAlign: "center" }}>
+        Você precisa bater o ponto para ter registros nesta página.
+      </Text>
+    </View>
+  )
+
   return (
     <View style={{ flex: 1 }}>
       <View style={Styles.calendarButtonContainer}>
         <TouchableOpacity onPress={toggleModal} style={Styles.calendarButton}>
-          <Text style={Styles.calendarButtonText}>Filtrar por Data</Text>
+          <Text style={[Styles.calendarButtonText, { width: 90 }]}>Filtrar por Data</Text>
         </TouchableOpacity>
-        <View style={Styles.calendarButtonContainer}>
-          <TouchableOpacity onPress={toggleModal} style={Styles.calendarButton}>
-            <Text style={Styles.calendarButtonText}>Filtrar por Data</Text>
+        {selectedDate && (
+          <TouchableOpacity onPress={clearFilters} style={Styles.calendarButton}>
+            <Text style={[Styles.calendarButtonText, { width: 90 }]}>Limpar Filtro</Text>
           </TouchableOpacity>
-          {selectedDate && (
-            <TouchableOpacity onPress={clearFilters} style={Styles.calendarButton}>
-              <Text style={Styles.calendarButtonText}>Limpar Filtros</Text>
-            </TouchableOpacity>
-          )}
-        </View>
+        )}
       </View>
 
       <ScrollView style={Styles.listRegistries}>
@@ -106,12 +131,18 @@ const RegistriesView = (): JSX.Element => {
             </View>
           ))
         )}
-      </ScrollView>
 
-      <Modal
-        style={{ alignItems: "center", flex: 1, justifyContent: "center", marginTop: 20 }}
-        visible={isModalVisible}
-      >
+        {Object.keys(groupedRegistries).length === 0 && !selectedDate && renderNoRecordsMessage()}
+      </ScrollView>
+      <Modal animationType="slide" transparent={true} visible={editModalVisible}>
+        <EditRegistryModal
+          visible={editModalVisible}
+          onClose={handleCloseEditModal}
+          registry={selectedRegistry}
+        />
+      </Modal>
+
+      <Modal visible={isModalVisible}>
         <View style={Styles.modalContent}>
           <Calendar
             onDayPress={handleDayPress}

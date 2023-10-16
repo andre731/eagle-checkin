@@ -5,11 +5,12 @@ export const Style = StyleSheet.create({
   container: {
     flex: 1,
     width: "100%",
+    height: 80,
     alignContent: "center",
     alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 50,
-    paddingBottom: 20,
+    justifyContent: "space-around",
+    paddingTop: 10,
+    paddingBottom: 90,
   },
 
   containerLogo: {
