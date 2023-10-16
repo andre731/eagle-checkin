@@ -7,10 +7,12 @@ import {
 } from "@react-navigation/stack"
 import { NavigationContainer } from "@react-navigation/native"
 
-import { LoginView } from "@views/login/login.view"
-import PointView from "@views/point/point.view"
-import { WelcomeScreen } from "@views/welcome/welcome.view"
 import MobxProvider from "@/store/provider"
+
+import PointView from "@views/point/point.view"
+import userView from "@/views/user/user.view"
+import { LoginView } from "@views/login/login.view"
+import { WelcomeScreen } from "@views/welcome/welcome.view"
 
 const stack = createStackNavigator()
 
@@ -26,6 +28,7 @@ export const Router = () => {
         >
           <stack.Screen name="LoginView" component={LoginView} />
           <stack.Screen name="PointView" component={PointView} />
+          <stack.Screen name="UserView" component={userView} />
           <stack.Screen
             options={{
               gestureDirection: "horizontal",
