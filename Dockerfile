@@ -1,29 +1,28 @@
-FROM node:18-buster-slim
+# Use the official Node.js image with a specific version
+FROM node:14
 
+# Set the working directory inside the container
+WORKDIR /app
 
-ARG NODE_ENV=development
-ENV NODE_ENV $NODE_ENV
+# Copy package.json and package-lock.json to the working directory
+COPY package*.json ./
 
-ARG PORT=19000
-ENV PORT $PORT
-EXPOSE 1900 19001 19002
+# Install dependencies
+RUN npm install
+
+# Install Expo CLI globally
+RUN npm install -g expo-cli@4.12.0
+
+# Copy the rest of the application files
+COPY . .
+
+# Expose the necessary ports
+EXPOSE 19000
+
+# Set the environment variables
 ENV REACT_NATIVE_PACKAGER_HOSTNAME="192.168.10.212"
+ENV NODE_ENV=production
+ENV PORT=19000
 
-ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
-ENV PATH /home/node/.npm-global/bin:$PATH
-RUN npm i --unsafe-perm -g npm@latest expo-cli@latest
-RUN apt-get update && apt-get install -y qemu-user-static
-RUN yarn add @expo/ngrok
-
-RUN mkdir /opt/my-app && chown root:root /opt/my-app
-WORKDIR /opt/my-app
-ENV PATH /opt/my-app/.bin:$PATH
-USER root
-COPY package.json package-lock.json ./
-RUN yarn install
-
-WORKDIR /opt/my-app
-COPY . /opt/my-app/
-
-
-CMD ["npx","expo", "start"]
+# Start the Expo development server
+CMD ["npm", "start"]
